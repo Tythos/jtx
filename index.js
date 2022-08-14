@@ -2,7 +2,12 @@
   * @author <code@tythos.net>
   */
 
-define(function(require, exports, module) {
+if (typeof(define) !== "function" || define.amd !== true) {
+	// specify a commonjs-compatible define() factory hook
+	define = (factory) => module.exports = factory(require, {}, module);
+}
+define(function(require, _, module) {
+	let exports = {};
 	exports.String = {};
 	exports.Array = {};
 	exports.Object = {};
@@ -64,7 +69,7 @@ define(function(require, exports, module) {
 		return result;
 	};
 
-	jtx.Array.complement = function(obj, rhs) {
+	exports.Array.complement = function(obj, rhs) {
 		/* Returns all elements from Array obj NOT present in Array rhs.
 		   Technically, this is the "relative complement".
 		*/
@@ -84,7 +89,7 @@ define(function(require, exports, module) {
 		return exports.Array.union(obj, obj);
 	};
 
-	jtx.Array.count = function(arr, val) {
+	exports.Array.count = function(arr, val) {
 		/* Returns the number of times that *val* occurs in *arr*.
 		*/
 		return arr.reduce(function(acc, cv) {
@@ -92,7 +97,7 @@ define(function(require, exports, module) {
 		}, 0);
 	};
 
-	jtx.Array.where = function(arr, val) {
+	exports.Array.where = function(arr, val) {
 		/* Returns an Array (could be empty) of all indices where *val* occurs in *arr*.
 		*/
 		let ndcs = [];
@@ -104,7 +109,7 @@ define(function(require, exports, module) {
 		return ndcs;
 	};
 	
-	jtx.Array.argSort = function(arr) {
+	exports.Array.argSort = function(arr) {
 		/* Returns indices of items in the given array after it has been
 		   sorted, such that arr[ndcs] = sorted(arr).
 		*/
@@ -155,7 +160,7 @@ define(function(require, exports, module) {
 		return -1 < keys.indexOf(key);
 	};
 
-	jtx.Object.select = function(obj, keys) {
+	exports.Object.select = function(obj, keys) {
 		/* Creates a copy of the object with only the given keys copied.
 		*/
 		let copy = {};
@@ -165,7 +170,7 @@ define(function(require, exports, module) {
 		return copy;
 	};
 
-	jtx.Object.iterItems = function(obj, handler) {
+	exports.Object.iterItems = function(obj, handler) {
 		/* Invokes the given handler for each key-value pair in the object.
 		   Parameters are (key, value, index).
 		*/
@@ -182,7 +187,7 @@ define(function(require, exports, module) {
 	// timestamp (in Julian days) of the J2000 epoch
 	exports.Date.j2000_jd = 2451545.0;
 
-	jtx.Date.offsetBy = function(obj, dt_s) {
+	exports.Date.offsetBy = function(obj, dt_s) {
 		/* Returns a new Date equal to the given date incremented by the given
 		   number of seconds.
 		*/
@@ -363,26 +368,28 @@ define(function(require, exports, module) {
 		return machEps;
 	};
 
-	jtx.Number.toCommas = function(n) {
+	exports.Number.toCommas = function(n) {
 		/* Returns a string formatting of the given number that includes commas in each thousands place.
 		*/
 		return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 	};
 
-	jtx.Number.modpos = function(x, n) {
+	exports.Number.modpos = function(x, n) {
 		/* Modulo operator with positive-bias--e.g., result will always be
 		   between 0 and n
 		*/
 		let m = x % n;
 		if (m < 0) { m += n; }
-		return n;
+		return m;
 	};
 
-	Object.assign(exports, {
+	return Object.assign(exports, {
 		"__url__": "https://github.com/Tythos/jtx.git",
 		"__semver__": "v1.2.0",
 		"__license__": "MIT",
-    "__deps__": {},
-    "__tests__": []
-  });
+		"__deps__": {},
+		"__tests__": [
+			(assert) => assert(exports.Number.modpos(-1.0, 2.0) === 1.0)
+		]
+	});
 });
